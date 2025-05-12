@@ -19,21 +19,18 @@ def get_default_resolution():
 
 
 def download(url, output_path, resolution):
-    """Download YouTube video with progress bar using yt-dlp and tqdm."""
-
-    os.makedirs(output_path, exist_ok=True)
-    print(
-        f"Downloading video to: {os.path.abspath(output_path)} with a resolution of {resolution}p")
-
+    """Download YouTube video using yt-dlp"""
     def progress(d):
-        if d['status'] == 'downloading':
-            print("Downloading...")
-
-        elif not valid_youtube_url(url):
-            print("Invalid YouTube URL. Please provide a valid YouTube link.")
-
-        elif d['status'] == 'finished':
-            print("Download completed!")
+        if 'filename' in d and os.path.exists(d['filename']):
+            print(" Already downloaded")
+            return
+        if not valid_youtube_url(url):
+            print(" Download failed: Invalid YouTube URL")
+            return
+        if valid_youtube_url(url) and not 'filename' in d and os.path.exists(d['filename']):
+            os.makedirs(output_path, exist_ok=True)
+            print(
+                f"Downloading video to: {os.path.abspath(output_path)} with a resolution of {resolution}p")
 
     ydl_opts = {
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
